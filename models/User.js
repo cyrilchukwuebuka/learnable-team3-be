@@ -20,11 +20,11 @@ const UserSchema = new mongoose.Schema(
             require: true,
             min: 6
         },
-        profilePicture: {
+        imgUrl: {
             type: String,
             default: ""
         },
-        followers: {
+        posts: {
             type: Array,
             default: []
         },

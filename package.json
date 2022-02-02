@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/cyrilchukwuebuka/learnable-team3-be#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "dotenv": "^15.0.0",
     "express": "^4.17.2",
     "helmet": "^5.0.2",
