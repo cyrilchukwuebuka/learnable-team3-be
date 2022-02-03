@@ -2,7 +2,7 @@ const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const nodemailer = require(nodemailer)
+const nodemailer = require("nodemailer")
 
 router.get("/", (req, res) => {
     res.send("Welcome to user user page");
@@ -88,7 +88,7 @@ router.put("/forgotpassword", async (req, res) => {
                 service: 'gmail',
                 auth: {
                     user: 'team3genesys@gmail.com',
-                    password: '!!!1234abc!!!'
+                    pass: '!!!1234abc!!!'
                 }
             })
             const mailOptions = {
@@ -97,13 +97,12 @@ router.put("/forgotpassword", async (req, res) => {
                 subject: 'Start Forgot Password',
                 text: 'https://google.com'
             }
-    
             transporter.sendMail(mailOptions, function(err, info){
                 if (err) {
-                    res.status(500).json(err);
+                    res.status(500).json(err.message);
                 } else {
                     res.status(200).json({
-                        "status": "Success",
+                        "status": "success",
                         "message": "email sent",
                         "data": {
                             "username": user.username
@@ -114,7 +113,7 @@ router.put("/forgotpassword", async (req, res) => {
         }
         
     } catch (err) {
-        res.status(500).json(err);
+        res.status(500).json(err.stack);
     }
 })
 

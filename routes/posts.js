@@ -2,26 +2,29 @@ const router = require("express").Router();
 var formidable = require('formidable');
 
 //import contollers
-const postController = require("../controllers/posts");
+const postController = require("../controllers/post");
+// import user model
+const User = require("../models/User");
+require('dotenv').config()
+const cloudinary = require("cloudinary");
 
-
-// Get All Images
-router.get("/getallimages", async (req, res) => {
-    var allPosts = await postController.getAllImages();
-
-    res.status(200).json({
-        message: "All images fetched",
-        statuscode: 200,
-        status: 'success',
-        posts: allPosts
-
-    });
+// Cloudinary configuration settings
+// This will be fetched from the .env file in the root directory
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
 });
 
 
 // Upload a new image
-router.post("/upload", async (req, res) => {
+router.post("/", async (req, res) => {
+
+
+    // The Image To Upload
     const theImageToUpload = req.body.image;
+
+    console.log(theImageToUpload);
     // Confirm that the image is not empty
     if (theImageToUpload === undefined) {
         res.status(400).json({
@@ -31,8 +34,8 @@ router.post("/upload", async (req, res) => {
         });
     }
 
-    const postDescription = req.body.description;
     // Post Description
+    const postDescription = req.body.description;
     //confirm postdescription is not empty
     if (!postDescription) {
         return res.status(400).send({
@@ -51,9 +54,9 @@ router.post("/upload", async (req, res) => {
     }
 
     // User Id
-    const userId = req.body.userId;
+    const username = req.body.username;
     //confirm userId is not empty
-    if (!userId) {
+    if (!username) {
         return res.status(400).send({
             status: "error",
             statuscode: 400,
@@ -61,12 +64,24 @@ router.post("/upload", async (req, res) => {
         });
     }
 
-    const image = postController.uploadNewPost(
-        userId,
-        postDescription,
-        theImageToUpload,
-    );
 
+
+    // Upload image to cloudinary
+    const results = await cloudinary.uploader.upload(
+        theImageToUpload, {
+            folder: "instagram-clone"
+        });
+
+        console.log(results);
+
+
+        // called contoller
+    const image = await postController.uploadNewPost(
+        username,
+        postDescription,
+        results.url,
+    );
+    console.log(image);
     if (image.status === "success") {
         res.status(200).json(image);
     } else if (image.status === "error") {
@@ -78,10 +93,26 @@ router.post("/upload", async (req, res) => {
 
 
 
+// Get All Images
+router.get("/getallimages", async (req, res) => {
+    var allPosts = await postController.getAllImages();
+
+    res.status(200).json({
+        message: "All images fetched",
+        statuscode: 200,
+        status: 'success',
+        posts: allPosts
+
+    });
+});
+
+
+
+
 
 
 // Like a post
-router.post("/like", async (req, res) => {
+router.put("/like", async (req, res) => {
     const postId = req.body.postId;
     //confirm postId is not empty
     if (!postId) {
@@ -92,18 +123,18 @@ router.post("/like", async (req, res) => {
         });
     }
 
-    const userId = req.body.userId;
+    const username = req.body.username;
     //confirm userId is not empty
-    if (!userId) {
+    if (!username) {
         return res.status(400).send({
             status: "error",
             statuscode: 400,
-            message: "User Id is required"
+            message: "User Name is required"
         });
 
     }
 
-    const like = await postController.like(postId, userId);
+    const like = await postController.like(postId, username);
     if (like.status === "success") {
         res.status(200).json(like);
     } else if (like.status === "error") {
@@ -117,7 +148,7 @@ router.post("/like", async (req, res) => {
 
 
 // Unlike a post
-router.post("/unlike", async (req, res) => {
+router.put("/unlike", async (req, res) => {
     const postId = req.body.postId;
     //confirm postId is not empty
     if (!postId) {
@@ -128,18 +159,18 @@ router.post("/unlike", async (req, res) => {
         });
     }
 
-    const userId = req.body.userId;
+    const username = req.body.username;
     //confirm userId is not empty
-    if (!userId) {
+    if (!username) {
         return res.status(400).send({
             status: "error",
             statuscode: 400,
-            message: "User Id is required"
+            message: "User Name is required"
         });
 
     }
 
-    const unlike = await postController.unlike(postId, userId);
+    const unlike = await postController.unlike(postId, username);
 
     if (unlike.status === "error") {
         return res.status(400).json(unlike);

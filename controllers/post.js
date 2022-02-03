@@ -1,50 +1,50 @@
 // Import Post Model
 const Post = require("../models/Post");
 
-const cloudinary = require("cloudinary");
-require('dotenv').config()
+// Import User Model
+const User = require("../models/User");
 
-// Cloudinary configuration settings
-// This will be fetched from the .env file in the root directory
-cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.API_KEY,
-    api_secret: process.env.API_SECRET
-});
 
 // Post Controller
 const post = {};
 
 // Create A new post and upload image to cloudinary
-post.uploadNewPost = async ({
+post.uploadNewPost = async (
     username,
     postDescription,
-    image
-}) => {
+    imageUrl
+) => {
     try {
-        // Upload image to cloudinary
-        const imgStr = image
-        const imageUrl = await cloudinary.uploader.upload(imgStr, {
-                folder: "vibez_posts"
-            });
+        // Confirm username exists
+        console.log("user: " + username);
+        const user = await User.findOne({
+            username: username
+        });
 
-        // Get Url of image and resize it
-        // const imageUrlResized = await cloudinary.url(imageUrl.public_id, {
-        //     width: 500,
-        //     height: 600,
-        //     crop: "fill"
-        // });
-
-       
+        if (!user) {
+            return {
+                status: "errors",
+                statuscode: 400,
+                message: "Username does not exist"
+            };
+        }
 
 
         // Create a new post
         const newPost = new Post({
             username: username,
             description: postDescription,
-            image: imageUrl.url
+            image: imageUrl
         });
         await newPost.save();
+
+        await User.findOneAndUpdate({
+            username: username
+        }, {
+            $push: {
+                posts: newPost._id
+            }
+        });
         return {
             status: "success",
             statuscode: 200,
@@ -103,10 +103,10 @@ post.getAllPostByusername = async ({
 
 
 // Like a post
-post.like = async ({
-    username,
-    postId
-}) => {
+post.like = async (
+    postId,
+    username
+) => {
     // Add user to list of post likes
     try {
         const thePost = await Post.findById(postId);
@@ -121,7 +121,7 @@ post.like = async ({
         return {
             status: "error",
             statuscode: 400,
-            error: error
+            error: error.message
         };
     }
 
@@ -129,13 +129,13 @@ post.like = async ({
 
 
 // Unlike a post
-post.unlike = ({
-    username,
-    postId
-}) => {
+post.unlike = async (
+    postId,
+    username
+) => {
     // Remove user from list of post likes
     try {
-        const thePost = Post.findById(postId);
+        const thePost = await Post.findById(postId);
         const index = thePost.likes.indexOf(username);
         thePost.likes.splice(index, 1);
         thePost.save();
@@ -148,7 +148,7 @@ post.unlike = ({
         return {
             status: "error",
             statuscode: 400,
-            error: error
+            error: error.message
         };
     }
 }
