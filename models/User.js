@@ -20,10 +20,6 @@ const UserSchema = new mongoose.Schema(
             require: true,
             min: 6
         },
-        imgUrl: {
-            type: String,
-            default: ""
-        },
         posts: {
             type: Array,
             default: []
