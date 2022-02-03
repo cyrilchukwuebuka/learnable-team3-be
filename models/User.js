@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
     {
         username: {
             type: String,
@@ -20,10 +20,10 @@ const UserSchema = new mongoose.Schema(
             require: true,
             min: 6
         },
-        posts: {
-            type: Array,
-            default: []
-        },
+        posts: [{
+            type: Schema.Types.ObjectId,
+            ref: 'post'
+        }],
         following: {
             type: Array,
             default: []
@@ -32,4 +32,4 @@ const UserSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("user", userSchema);

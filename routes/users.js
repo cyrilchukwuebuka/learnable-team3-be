@@ -6,6 +6,23 @@ router.get("/", (req, res) => {
     res.send("Welcome to user user page");
 });
 
+router.get("/:username", async (req, res) => {
+    try {
+        const user = await User
+                .findOne({ username: req.params.username})
+                .populate('posts')
+                .select('-password')
+
+        res.status(200).json({
+            "status" : "success",
+            "message" : "user gotten",
+            "data": user
+        })
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
 //Follow a User
 router.put("/:username/follow", async (req, res) => {
     if (req.body.username !== req.params.username) {

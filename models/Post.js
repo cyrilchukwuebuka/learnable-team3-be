@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
-const PostSchema = new mongoose.Schema(
+const postSchema = new mongoose.Schema(
     {
-        userId: {
+        username: {
             type: String,
             required: true
         },
@@ -10,15 +10,14 @@ const PostSchema = new mongoose.Schema(
             type: String,
             max: 500
         },
-        image: {
+        imgUrl: {
             type: String
         },
         likes: {
-            type: Array,
-            default: []
+            type: Number
         }
     },
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Post", PostSchema);
+module.exports = mongoose.model("post", postSchema);
