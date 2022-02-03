@@ -24,12 +24,9 @@ router.post("/register", async (req, res) => {
             "status": "success",
             "message": "account created",
             "data": {
-                "status": "success",
-                "message": "account created",
-                "data": {
-                    "email": req.body.email,
-                    "username": req.body.username
-                }
+                "email": newUser.email,
+                "username": newUser.username,
+                "_id": newUser._id,
             }
         });
     } catch (e) {

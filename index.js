@@ -6,28 +6,37 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const userRoute = require("./routes/users");
 const authRoute = require("./routes/auth");
+const postRoute = require("./routes/posts")
+const fileupload = require('express-fileupload');
+
+app.use(fileupload({
+    useTempFiles: true,
+}));
 
 dotenv.config();
+// Port our server is listening on
+const PORT = process.env.PORT || 5000;
 
-const port = 8800;
 
 //middleware
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
-app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
-// app.use("/api/posts", postRoute);
+app.use("/api/users", userRoute);
+app.use("/api/posts", postRoute);
 
-mongoose.connect(process.env.MONGODB_URL_TEST,
-    {
+// Not found route - 404
+app.use("**", (req, res) => {
+    res.status(404).send({
+        message: "Route not found"
+    })
+})
+
+mongoose.connect(process.env.MONGODB_URL_TEST, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
-    .then(() => app.listen(port, () => console.log(`Server is running on Port: ${port}`)))
+    .then(() => app.listen(PORT, () => console.log(`Backend server is running on http://localhost:${PORT}`)))
     .catch(err => console.log(err))
-
-// app.listen(8800, () => {
-//     console.log("Backend server is running");
-// });
