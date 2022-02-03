@@ -17,7 +17,7 @@ const post = {};
 
 // Create A new post and upload image to cloudinary
 post.uploadNewPost = async ({
-    userId,
+    username,
     postDescription,
     image
 }) => {
@@ -40,7 +40,7 @@ post.uploadNewPost = async ({
 
         // Create a new post
         const newPost = new Post({
-            userId: userId,
+            username: username,
             description: postDescription,
             image: imageUrl.url
         });
@@ -80,12 +80,12 @@ post.getAllPost = async () => {
 
 
 // Get All Post By User
-post.getAllPostByUserId = async ({
-    userId
+post.getAllPostByusername = async ({
+    username
 }) => {
     try {
         const userPosts = await Post.find({
-            userId: userId
+            username: username
         });
         return {
             status: "success",
@@ -104,13 +104,13 @@ post.getAllPostByUserId = async ({
 
 // Like a post
 post.like = async ({
-    userId,
+    username,
     postId
 }) => {
     // Add user to list of post likes
     try {
         const thePost = await Post.findById(postId);
-        await thePost.likes.push(userId);
+        await thePost.likes.push(username);
         await thePost.save();
         return {
             status: "success",
@@ -130,13 +130,13 @@ post.like = async ({
 
 // Unlike a post
 post.unlike = ({
-    userId,
+    username,
     postId
 }) => {
     // Remove user from list of post likes
     try {
         const thePost = Post.findById(postId);
-        const index = thePost.likes.indexOf(userId);
+        const index = thePost.likes.indexOf(username);
         thePost.likes.splice(index, 1);
         thePost.save();
         return {
