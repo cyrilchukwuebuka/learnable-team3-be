@@ -3,7 +3,12 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
 router.get("/", (req, res) => {
-    res.send("Welcome to user auth page");
+    res.send(
+        {
+            "status": "success",
+            "message": "Welcome to user auth page",
+        }
+    );
 });
 
 router.post("/register", async (req, res) => {

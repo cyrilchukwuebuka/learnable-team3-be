@@ -5,20 +5,28 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer")
 
 router.get("/", (req, res) => {
-    res.send("Welcome to user user page");
+    res.send(
+        {
+            "status": "success",
+            "message": "Welcome to user user page",
+        }
+        
+        );
 });
 
 //Get User by Username including Posts
 router.get("/:username", async (req, res) => {
     try {
         const user = await User
-                .findOne({ username: req.params.username})
-                .populate('posts')
-                .select('-password')
+            .findOne({
+                username: req.params.username
+            })
+            .populate('posts')
+            .select('-password')
 
         res.status(200).json({
-            "status" : "success",
-            "message" : "user gotten",
+            "status": "success",
+            "message": "user gotten",
             "data": user
         })
     } catch (err) {
@@ -30,9 +38,15 @@ router.get("/:username", async (req, res) => {
 router.put("/:username/follow", async (req, res) => {
     if (req.body.username !== req.params.username) {
         try {
-            const currentUser = await User.findOne({ username: req.body.username });
+            const currentUser = await User.findOne({
+                username: req.body.username
+            });
             if (!currentUser.following.includes(req.params.username)) {
-                await currentUser.updateOne({ $push: { following: req.params.username } });
+                await currentUser.updateOne({
+                    $push: {
+                        following: req.params.username
+                    }
+                });
                 console.log('step 3')
                 res.status(200).json({
                     "status": "success",
@@ -44,7 +58,7 @@ router.put("/:username/follow", async (req, res) => {
             } else {
                 res.status(403).json("You already follow the user");
             }
-        } catch(err){
+        } catch (err) {
             res.status(500).json(err);
         }
     } else {
@@ -56,9 +70,15 @@ router.put("/:username/follow", async (req, res) => {
 router.put("/:username/unfollow", async (req, res) => {
     if (req.body.username !== req.params.username) {
         try {
-            const currentUser = await User.findOne({ username: req.body.username });
+            const currentUser = await User.findOne({
+                username: req.body.username
+            });
             if (currentUser.following.includes(req.params.username)) {
-                await currentUser.updateOne({ $pull: { following: req.params.username } });
+                await currentUser.updateOne({
+                    $pull: {
+                        following: req.params.username
+                    }
+                });
                 res.status(200).json({
                     "status": "success",
                     "message": "user has been unfollowed",
@@ -69,7 +89,7 @@ router.put("/:username/unfollow", async (req, res) => {
             } else {
                 res.status(403).json("You already unfollowed the user");
             }
-        } catch(err){
+        } catch (err) {
             res.status(500).json(err);
         }
     } else {
@@ -80,7 +100,9 @@ router.put("/:username/unfollow", async (req, res) => {
 //Begin Forgot Password
 router.put("/forgotpassword", async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.body.email})
+        const user = await User.findOne({
+            email: req.body.email
+        })
         if (!user) {
             res.status(500).json("user does not exist");
         } else {
@@ -97,7 +119,7 @@ router.put("/forgotpassword", async (req, res) => {
                 subject: 'Start Forgot Password',
                 text: 'https://google.com'
             }
-            transporter.sendMail(mailOptions, function(err, info){
+            transporter.sendMail(mailOptions, function (err, info) {
                 if (err) {
                     res.status(500).json(err.message);
                 } else {
@@ -111,7 +133,7 @@ router.put("/forgotpassword", async (req, res) => {
                 }
             })
         }
-        
+
     } catch (err) {
         res.status(500).json(err.stack);
     }
@@ -119,10 +141,14 @@ router.put("/forgotpassword", async (req, res) => {
 
 router.put("/resetpassword", async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.body.username })
+        const user = await User.findOne({
+            username: req.body.username
+        })
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
-        await user.updateOne({ password: hashedPassword})
+        await user.updateOne({
+            password: hashedPassword
+        })
 
         res.status(200).json({
             "status": "success",
@@ -133,7 +159,7 @@ router.put("/resetpassword", async (req, res) => {
         });
 
     } catch (err) {
-        
+
     }
 })
 module.exports = router;
