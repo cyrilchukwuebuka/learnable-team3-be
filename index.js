@@ -15,8 +15,11 @@ app.use(fileupload({
 
 dotenv.config();
 // Port our server is listening on
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
+if (PORT == null || PORT == "") {
+    PORT = 5000;
+}
 
 //middleware
 app.use(express.json());
@@ -38,5 +41,5 @@ mongoose.connect(process.env.MONGODB_URL_TEST, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
-    .then(() => app.listen(PORT, () => console.log(`Backend server is running on http://localhost:${PORT}`)))
+    .then(() => app.listen(PORT))
     .catch(err => console.log(err))

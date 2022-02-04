@@ -1,3 +1,7 @@
 # dependencies
 node_modules/
 .env
+/node_modules
+npm-debug.log
+.DS_Store
+/*.env
